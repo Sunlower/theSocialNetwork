@@ -11,7 +11,7 @@ enum AuthenticationError: Error {
     case invalidCredentials
     case custom(errorMessage: String)
 }
-
+//////
 class API {
     func getPosts(completion: @escaping ([Post]) -> ()) {
         guard let url = URL(string: "http://localhost:8080/posts") else { return }
@@ -26,16 +26,16 @@ class API {
         .resume()
     }
 
-    func getNewPost(token: String, content: String) async -> ((Post?)){
+    func getNewPost(token: String, post: String) async -> (Post?){
 
-        guard let url = URL(string:"http://127.0.0.1:8080/users/posts") else {return nil}
+        guard let url = URL(string:"http://localhost:8080/posts") else {return nil}
 
-        let data = content.data(using: .utf8)!
+        let data = post.data(using: .utf8)!
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
 
         request.setValue("text/plain", forHTTPHeaderField: "Content-type")
-        request.setValue("Baerer \(token)", forHTTPHeaderField: "Authorization")
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
 
         request.httpBody = data as Data
 
@@ -54,21 +54,25 @@ class API {
         })
 
         do {
-            let (data, _) = try await URLSession.shared.data(for: request)
-            let finalData  = try! JSONDecoder().decode(Post.self, from: data)
-            print(finalData)
-            return finalData
-
-        } catch{
-            print("error")
+            let (data, response) = try await URLSession.shared.data(for: request)
+            guard let res = response as? HTTPURLResponse else { return nil }
+            if (200..<300).contains(res.statusCode) {
+                let finalData  = try JSONDecoder().decode(Post.self, from: data)
+                print(finalData)
+                return finalData
+            } else {
+                print("🚨 STATUS CODE \(res.statusCode)\n\(String(data: data, encoding: .utf8) ?? "Body is nil")")
+            }
+        } catch {
+            print(error)
         }
 
         return nil
     }
 
-    func getLogin(email: String, password: String) async -> Session? {
+    static func getLogin(email: String, password: String) async -> Session? {
 
-        let url = URL(string:"http://127.0.0.1:8080/users/login")
+        let url = URL(string:"http://localhost:8080/users/login")
 
         let body: String = "\(email):\(password)"
         let encodeBody = body.data(using: String.Encoding.utf8)!
@@ -80,7 +84,7 @@ class API {
         request.setValue("Basic \(base64)", forHTTPHeaderField: "Authorization")
         do {
             let (data, _) = try await URLSession.shared.data(for: request)
-            let finalData  = try! JSONDecoder().decode(Session.self, from: data)
+            let finalData  = try JSONDecoder().decode(Session.self, from: data)
             print(finalData)
             return finalData
             
@@ -91,7 +95,7 @@ class API {
     }
 
     func getLogout( token: String, completion: @escaping (Session?) -> ())  {
-        let url = URL(string:"http://127.0.0.1:8080/users/logout")
+        let url = URL(string:"http://localhost:8080/users/logout")
 
         var request = URLRequest(url: url!)
 
@@ -111,7 +115,7 @@ class API {
 
     func NewUser(name: String, email: String, password: String, completion: @escaping (Result<String, AuthenticationError>) -> Void){
 
-        guard let url = URL(string:"http://127.0.0.1:8080/users") else {return}
+        guard let url = URL(string:"http://localhost:8080/users") else {return}
 
         let body: [String: String] = [ "name": name ,"email": email, "password": password]
 
@@ -136,31 +140,9 @@ class API {
         }.resume()
     }
 
-    func getDeleteUser(id: UUID, name: String, email: String, avatar: String?, completion: @escaping (User) -> Void){
-
-        guard let url = URL(string:"http://127.0.0.1:8080/users") else {return}
-
-        var request = URLRequest(url: url)
-        request.httpMethod = "DELETE"
-
-        URLSession.shared.dataTask(with: request) { (data, response, _) in
-
-            guard let data = data else { return }
-
-            do {
-                let user = try JSONDecoder().decode(User.self, from: data)
-                completion(user)
-            } catch {
-               print("error")
-            }
-
-        }.resume()
-
-
-    }
 
     func getLike(id: UUID, completion: @escaping (Post?) -> Void){
-        guard let url = URL(string:"http://127.0.0.1:8080/users/posts") else {return}
+        guard let url = URL(string:"http://localhost:8080/likes") else {return}
 
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
@@ -168,6 +150,8 @@ class API {
         request.setValue("text/plain", forHTTPHeaderField: "Content-type")
 
         request.httpBody = try! JSONEncoder().encode(id)
+
+
 
         URLSession.shared.dataTask(with: request) { (data, response, _) in
 

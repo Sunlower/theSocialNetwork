@@ -22,14 +22,16 @@ struct SocialNetworkApp: App {
 
 struct ApplicationSwitcher: View {
 
-    @EnvironmentObject var vm: LoginViewModel
+    @EnvironmentObject var loginVM: LoginViewModel
+    @EnvironmentObject var postVM: PostViewModel
     @State var session : Session?
+    @State var post : Post? = Post()
 
     var body: some View {
-        if (vm.isLoggedIn) {
-            Home(session: $session)
+        if (loginVM.isLoggedIn) {
+            Home(session: $session, post: $post)
         } else {
-            Login( login: $session)
+            Home(session: $session, post: $post)
         }
 
     }

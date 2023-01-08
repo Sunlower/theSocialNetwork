@@ -47,7 +47,8 @@ struct Config: View {
 
                 Button {
                     Task{
-                        loginVM.getLogout
+                        loginVM.getLogout(session: session!)
+                        isPresent = false
                     }
                 } label: {
                     Text("Logout")
@@ -82,7 +83,7 @@ struct Config: View {
                 ToolbarItemGroup(placement: .cancellationAction) {
 
                     Button {
-                        isPresent = false
+                        self.isPresent = false
                     } label: {
                         Text("Cancel")
                             .font(Font.custom("Space Grotesk", size: 18))

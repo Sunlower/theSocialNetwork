@@ -20,6 +20,7 @@ struct CellHome: View{
             RoundedRectangle(cornerRadius: 22)
                 .fill(.thinMaterial)
                 .frame(width: 300, height: 132)
+                .padding(0)
 
             VStack(alignment: .leading){
 
@@ -68,7 +69,7 @@ struct CellHome: View{
 
 
             }
-            .padding(10)
+            .padding(1)
             .frame(width: UIScreen.main.bounds.width - 100, height: UIScreen.main.bounds.width - 50)
         }
     }

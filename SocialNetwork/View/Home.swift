@@ -10,13 +10,14 @@ import SwiftUI
 struct Home: View{
 
     @State var posts: [Post] = []
-    @State var post : Post?
     @State var showingSheet: Bool = false
     
     @Binding var session : Session?
+    @Binding var post : Post?
 
     @EnvironmentObject var postVM : PostViewModel
 
+    let selectDisplayMode : NavigationBarItem.TitleDisplayMode = .large
 
     var body: some View{
         NavigationView {
@@ -26,7 +27,7 @@ struct Home: View{
                 ScrollView(.vertical, showsIndicators: true) {
                     ForEach(posts, id: \.id) { post in
                         CellHome(post: post, session: $session)
-                    }
+                    }.padding(5)
 
                     ZStack(alignment: .bottomTrailing){
                         Button {
@@ -44,7 +45,7 @@ struct Home: View{
                             }
                         }
                         .sheet(isPresented: $showingSheet) {
-                            NewPost(showingSheet: $showingSheet, session: $session, posts: $posts)
+                            NewPost(showingSheet: $showingSheet, session: $session, post: $post, posts: $posts)
                         }
 
                     }
@@ -53,7 +54,7 @@ struct Home: View{
                 .toolbar {
                     ToolbarItemGroup(placement: .confirmationAction) {
 
-                        ZStack(alignment:.bottomTrailing){
+                        ZStack(alignment:.trailing){
                             ZStack{
                                 Circle()
                                     .frame(width: 32, height: 32, alignment: .leading)
@@ -66,7 +67,7 @@ struct Home: View{
                                     .foregroundColor(.black)
                                 NavigationLink("", destination: Profile( session: $session))
                             }
-                        }
+                        }.padding(2)
                     }
                 }
             }
@@ -78,6 +79,7 @@ struct Home: View{
         }
         .navigationTitle("Home")
         .accentColor(.black)
+        .navigationBarTitleDisplayMode(selectDisplayMode)
     }
 
     var emptyState: some View {

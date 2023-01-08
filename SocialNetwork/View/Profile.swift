@@ -33,7 +33,7 @@ struct Profile: View {
                     }
 
                 VStack{
-                    Text(loginVM.name)
+                    Text(session!.user.name)
                         .font(Font.custom("Space Grotesk", size: 20))
                         .foregroundColor(.black)
 

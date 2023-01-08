@@ -15,6 +15,7 @@ struct NewPost: View {
 
     @Binding var showingSheet: Bool
     @Binding var session: Session?
+    @Binding var post: Post?
     @Binding var posts: [Post]
     
 
@@ -48,8 +49,11 @@ struct NewPost: View {
 
                     Button {
                         Task{
-                            let post = await postVM.getNewPost(session: session!, content: postVM.content)
-                            self.posts.append = post
+                            self.post!.content = postVM.content
+                            let post = await postVM.getNewPost(session: session!, post: post!.content)
+                            if let post = post {
+                                self.posts.insert(post, at: 0)
+                            }
                         }
                         showingSheet = false
                     } label: {
